@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const pkgConf = require('pkg-conf');
 const program = require('commander');
+
 const {findPrivateKey} = require('../lib/private-key');
 
 program
@@ -11,9 +12,9 @@ program
   .option('-p, --port <n>', 'Port to start the server on', process.env.PORT || 3000)
   .option('-t, --tunnel <subdomain>', 'Expose your local bot to the internet', process.env.SUBDOMAIN || process.env.NODE_ENV !== 'production')
   .option('-a, --app <id>', 'ID of the GitHub App', process.env.APP_ID)
-  .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
-.parse(process.argv);
+  .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
+  .parse(process.argv);
 
 process.env.AUTH_METHOD = 'githubapp';
 
@@ -41,14 +42,12 @@ if (program.tunnel) {
 
 const createProbot = require('../');
 
-const probotopts = {
+const probot = createProbot({
   id: program.app,
   secret: program.secret,
   cert: program.privateKey,
   port: program.port
-};
-
-const probot = createProbot(probotopts);
+});
 
 pkgConf('probot').then(pkg => {
   const plugins = require('../lib/plugin')(probot);
