@@ -12,7 +12,7 @@
       "description": "the ID of your GitHub App"
     },
     "WEBHOOK_SECRET": {
-      "description": "noodles"
+      "description": "the secret configured for your GitHub App"
     },
     "LOG_LEVEL": {
       "required": false,
