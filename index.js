@@ -25,15 +25,12 @@ module.exports = (options = {}) => {
   });
 
   const webhook = createWebhook({path: '/', secret: options.secret || 'development'});
-
   const app = (process.env.AUTH_METHOD === 'githubapp') ? createApp({
     id: options.id,
     cert: options.cert,
     debug: process.env.LOG_LEVEL === 'trace'
   }) : null;
-
   const server = createServer(webhook);
-
   const robot = createRobot({webhook, cache, logger, catchErrors: true, app});
 
   // Forward webhooks to robot
