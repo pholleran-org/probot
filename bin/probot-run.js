@@ -5,7 +5,7 @@ require('dotenv').config()
 const pkgConf = require('pkg-conf')
 const program = require('commander')
 
-const { findPrivateKey } = require('../lib/private-key')
+const {findPrivateKey} = require('../lib/private-key')
 
 program
   .usage('[options] <apps...>')
@@ -15,7 +15,6 @@ program
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
   .option('-P, --private-key <file>', 'Path to certificate of the GitHub App', findPrivateKey)
   .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
-
   .parse(process.argv)
 
 process.env.AUTH_METHOD = 'githubapp'
