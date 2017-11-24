@@ -1,3 +1,7 @@
 module.exports = robot => {
-  console.log('laoded plugin');
+  robot.log('loaded app')
+
+  robot.on('issue_comment.created', context => {
+    context.log('Comment created')
+  })
 }
