@@ -2,30 +2,48 @@
 
 set -e
 
-# Checkout the gh-pages branch into the "out" directory
-[ -d ./out ] || git worktree add out origin/gh-pages
-
-# Update checkout
-cd out
-git pull origin gh-pages
-cd ..
-
 # Store the versions
-VERSION=$(npm view probot version)
+VERSION=$(node -e "process.stdout.write(require('./package.json').version)")
+HEAD=$(git rev-parse HEAD)
 
 # Generate docs
 npm run doc
 
-cd out
+# Checkout the website into the tmp directory
+[ -d tmp/website ] || {
+  REPO=https://github.com/probot/probot.github.io
+
+  # If GH_TOKEN environment variable is present, use that to push.
+  if [[ -n "$GH_TOKEN" ]]; then
+    REPO=${REPO/https:\/\//https://${GH_TOKEN}@}
+  fi
+
+  mkdir -p tmp
+  git clone $REPO tmp/website
+}
+
+# Update the website checkout
+cd tmp/website
+git pull origin master
 
 # Delete previously generated docs for this version
-rm -rf $VERSION
-mv probot/$VERSION .
-rmdir probot
+rm -rf api/$VERSION
 
-ln -sfn $VERSION latest
+# Copy over the new docs
+mv ../../out/probot/$VERSION api/$VERSION
+
+# Update the /api/latest link to point to this version
+ln -sfn $VERSION api/latest
+
+# Update the submodule
+git submodule update --init
+cd _submodules/probot
+git fetch
+git checkout $HEAD
+cd ../..
 
 # Commit and publish
 git add .
 git commit -m "Update docs for v$VERSION"
-git push origin gh-pages
+git tag -f v$VERSION
+git push --tags origin master

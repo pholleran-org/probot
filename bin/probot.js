@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 
-const semver = require('semver');
-const version = require('../package').engines.node;
+const semver = require('semver')
+const version = require('../package').engines.node
 
 if (!semver.satisfies(process.version, version)) {
-  console.log(`Node.js version ${version} is required. You have ${process.version}.`);
-  process.exit(1);
+  console.log(`Node.js version ${version} is required. You have ${process.version}.`)
+  process.exit(1)
 }
 
 require('commander')
@@ -14,4 +14,4 @@ require('commander')
   .command('run', 'run the bot with GitHub App integration')
   .command('runoauth', 'run the bot with OAuth App integration')
   .command('simulate', 'simulate a webhook being delivered')
-  .parse(process.argv);
+  .parse(process.argv)
