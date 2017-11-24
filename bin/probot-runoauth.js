@@ -13,6 +13,8 @@ program
   .option('-c, --clientid <id>', 'OAuth token for your application', process.env.CLIENT_ID)
   .option('-s, --secret <secret>', 'Webhook secret of the GitHub App', process.env.WEBHOOK_SECRET)
   .option('-s, --clientsecret <secret>', 'OAuth token for your application', process.env.CLIENT_SECRET)
+  .option('-w, --webhook-path <path>', 'URL path which receives webhooks. Ex: `/webhook`', process.env.WEBHOOK_PATH)
+
   .parse(process.argv);
 
 process.env.AUTH_METHOD = 'oauth';
@@ -23,38 +25,29 @@ program.app = program.integration;
   program.help();
 } */
 
-if (program.tunnel) {
+if (program.tunnel && !process.env.DISABLE_TUNNEL) {
   try {
-    const setupTunnel = require('../lib/tunnel');
+    const setupTunnel = require('../lib/tunnel')
     setupTunnel(program.tunnel, program.port).then(tunnel => {
-      console.log('Listening on ' + tunnel.url);
+      console.log('Listening on ' + tunnel.url)
     }).catch(err => {
-      console.warn('Could not open tunnel: ', err.message);
-    });
+      console.warn('Could not open tunnel: ', err.message)
+    })
   } catch (err) {
-    console.warn('Run `npm install --save-dev localtunnel` to enable localtunnel.');
+    console.warn('Run `npm install --save-dev localtunnel` to enable localtunnel.')
   }
 }
 
 const createProbot = require('../');
 
-const probotopts = {port: program.port,
+const probot = createProbot({
+  port: program.port,
   clientid: program.clientid,
   clientsecret: program.clientsecret,
   secret: program.secret
-};
-
-const probot = createProbot(probotopts);
+})
 
 pkgConf('probot').then(pkg => {
-  const plugins = require('../lib/plugin')(probot);
-  const requestedPlugins = program.args.concat(pkg.plugins || []);
-
-  // If we have explicitly requested plugins, load them; otherwise use autoloading
-  if (requestedPlugins.length > 0) {
-    plugins.load(requestedPlugins);
-  } else {
-    plugins.autoload();
-  }
-  probot.start();
-});
+  probot.setup(program.args.concat(pkg.apps || pkg.plugins || []))
+  probot.start()
+})
