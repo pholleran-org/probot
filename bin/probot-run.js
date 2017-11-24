@@ -5,9 +5,7 @@ require('dotenv').config()
 const pkgConf = require('pkg-conf')
 const program = require('commander')
 
-const {
-  findPrivateKey
-} = require('../lib/private-key')
+const { findPrivateKey } = require('../lib/private-key')
 
 program
   .usage('[options] <apps...>')
