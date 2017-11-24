@@ -18,7 +18,7 @@ program
 
   .parse(process.argv)
 
-process.env.AUTH_METHOD = 'githubapp';
+process.env.AUTH_METHOD = 'githubapp'
 
 if (!program.app) {
   console.warn('Missing GitHub App ID.\nUse --app flag or set APP_ID environment variable.')
